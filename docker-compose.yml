@@ -1,0 +1,72 @@
+version: "3.8"
+
+services:
+  database:
+    image: postgres:13.3-alpine
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: tabi_prod
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+  backend:
+    build:
+      context: "./api"
+      target: dev
+    container_name: backend
+    environment:
+      - APP_PORT
+      - APP_HOSTNAME
+      - DB_USER
+      - DB_PASSWORD
+      - DB_HOST
+    env_file: ".env"
+    expose:
+      - 4000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      - "traefik.port=80"
+      - "traefik.http.routers.backend.rule=Host(`api.contacts.localhost`)"
+    volumes:
+      - "./api:/app"
+    depends_on:
+      - database
+
+  client:
+    build:
+      context: "./client"
+      target: dev
+    container_name: client
+    ports:
+      - "3000:3000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.routers.client.rule=Host(`contacts.localhost`)"
+      - "traefik.port=80"
+    depends_on:
+      - backend
+    volumes:
+      - "./client:/app"
+
+  traefik:
+    image: traefik:v2.4
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "$PWD/traefik/traefik.dev.toml:/etc/traefik/traefik.toml"
+    depends_on:
+      - backend
+      - client
+
+volumes:
+  postgres_data:
+
+networks:
+  default:
+    external:
+      name: traefik
