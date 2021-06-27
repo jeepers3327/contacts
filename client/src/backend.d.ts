@@ -1,6 +1,6 @@
 interface Contact {
   id: number;
   name: string;
-  phoneNumber: string;
+  phone_number: string;
   email: string;
 }
