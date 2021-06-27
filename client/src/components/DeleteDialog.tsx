@@ -18,6 +18,7 @@ const DeleteDialog: FunctionComponent<DeleteDialogProps> = ({
   const performDelete = async () => {
     await fetch(`${import.meta.env.VITE_API_URL}/contacts/${id}`, {
       method: "DELETE",
+      mode: "cors",
     });
 
     deleteContact(id);

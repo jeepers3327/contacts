@@ -12,7 +12,7 @@ const CreateForm: FunctionComponent<CreateFormProps> = ({
   const [contact, setContact] = useState<Omit<Contact, "id">>({
     email: "",
     name: "",
-    phoneNumber: "",
+    phone_number: "",
   });
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -24,12 +24,13 @@ const CreateForm: FunctionComponent<CreateFormProps> = ({
         "Content-Type": "application/json",
       },
       method: "POST",
+      mode: "cors",
       body: JSON.stringify(data),
     });
 
-    const result: Contact = await submitData.json();
+    const result = await submitData.json();
 
-    appendContactToList(result);
+    appendContactToList(result["data"] as Contact);
     setOpen(false);
   };
 
@@ -81,7 +82,7 @@ const CreateForm: FunctionComponent<CreateFormProps> = ({
                     onChange={(event) =>
                       setContact({
                         ...contact,
-                        phoneNumber: event.target.value,
+                        phone_number: event.target.value,
                       })
                     }
                   />

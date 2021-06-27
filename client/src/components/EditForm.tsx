@@ -21,21 +21,22 @@ const EditForm: FunctionComponent<EditFormProps> = ({
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
+    const data = { contact: contactData };
     const updateContactData = await fetch(
       `${import.meta.env.VITE_API_URL}/contacts/${contact.id}`,
       {
         headers: {
           "Content-Type": "application/json",
         },
+        mode: "cors",
         method: "PUT",
-        body: JSON.stringify(contactData),
+        body: JSON.stringify(data),
       }
     );
 
-    const result: Contact = await updateContactData.json();
+    const result = await updateContactData.json();
 
-    updateContact(result);
+    updateContact(result["data"] as Contact);
     setOpen(false);
   };
 
@@ -78,11 +79,11 @@ const EditForm: FunctionComponent<EditFormProps> = ({
                 </label>
                 <div className="mt-1 flex rounded-md shadow-sm">
                   <input
-                    value={contactData.phoneNumber}
+                    value={contactData.phone_number}
                     onChange={(event) =>
                       setContactData({
                         ...contactData,
-                        phoneNumber: event.target.value,
+                        phone_number: event.target.value,
                       })
                     }
                     type="text"

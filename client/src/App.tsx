@@ -11,9 +11,14 @@ function App() {
 
   useEffect(() => {
     const fetchContacts = async () => {
-      const contacts = await fetch(`${import.meta.env.VITE_API_URL}/contacts`)
+      const contacts = await fetch(`${import.meta.env.VITE_API_URL}/contacts`, {
+        mode: "cors",
+        headers: {
+          "Content-Type": "application/son",
+        },
+      })
         .then((response) => response.json())
-        .then((data) => data);
+        .then(({ data }) => data);
 
       setContacts(contacts);
     };
@@ -41,7 +46,7 @@ function App() {
     setContact({
       id: id,
       name: "",
-      phoneNumber: "",
+      phone_number: "",
       email: "",
     });
     setOpen(true);
@@ -66,8 +71,6 @@ function App() {
 
   const deleteContact = (id: number) => {
     const updatedContacts = contacts.filter((cont) => cont.id !== id);
-    console.log(updatedContacts);
-
     setContacts(updatedContacts);
   };
 

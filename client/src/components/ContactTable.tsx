@@ -62,7 +62,7 @@ const ContactTable: FunctionComponent<ContactTableProps> = ({
                       </td>
                       <td className="px-10 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">
-                          {contact.phoneNumber}
+                          {contact.phone_number}
                         </div>
                       </td>
                       <td className="px-10 py-4 whitespace-nowrap text-sm text-gray-500">
