@@ -8,24 +8,23 @@ COPY . .
 
 EXPOSE 3000
 
-CMD [ "yarn", "dev", "--host" ]
+CMD ["yarn", "dev", "--host", "0.0.0.0"]
 
 FROM node:16-buster-slim as build-node
 
 WORKDIR /app
 
-COPY package.json yarn.lock ./
-COPY vite.config.ts ./
-COPY .env.production ./
-COPY src ./src/
-COPY tsconfig.json ./
-COPY index.html ./
+COPY package.json .
+COPY yarn.lock .
 
-RUN yarn install && yarn build
+RUN yarn install
 
+COPY . .
+
+RUN yarn build
 
 FROM nginx:1.21.0-alpine as prod
-EXPOSE 3000
+EXPOSE 80
 
 COPY --from=build-node /app/dist/ /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/nginx.conf
