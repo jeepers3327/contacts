@@ -10,56 +10,53 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
 
-  client:
-    build:
-      context: "./client"
-      target: dev
-    container_name: client
-    ports:
-      - "3000:3000"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=traefik"
-      - "traefik.http.routers.client.rule=Host(`client.contacts.localhost`)"
-      - "traefik.port=80"
-    volumes:
-      - "./client:/app"
-    depends_on:
-      - backend
-
   backend:
     build:
       context: "./api"
-      target: dev
-    container_name: backend
+      target: prod
     environment:
       - APP_PORT
       - APP_HOSTNAME
       - DB_USER
       - DB_PASSWORD
       - DB_HOST
-      - DB_NAME
-    env_file: ".env.dev"
-    ports:
-      - "4000:4000"
+    env_file: ".env"
+    expose:
+      - 4000
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
+      - "traefik.http.routers.backend.rule=Host(`contacts.blanknodes.com`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.backend.tls=true"
+      - "traefik.http.routers.backend.tls.certresolver=letsencrypt"
       - "traefik.port=80"
-      - "traefik.http.routers.backend.rule=Host(`contacts.localhost`) && PathPrefix(`/api`)"
-    volumes:
-      - "./api:/app"
     depends_on:
       - database
+
+  client:
+    build:
+      context: "./client"
+      target: prod
+    ports:
+      - "3000:3000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.routers.client.rule=Host(`contacts.blanknodes.com`)"
+      - "traefik.http.routers.client.tls=true"
+      - "traefik.http.routers.client.tls.certresolver=letsencrypt"
+      - "traefik.port=80"
+    depends_on:
+      - backend
 
   traefik:
     image: traefik:v2.4
     ports:
       - "80:80"
-      - "8080:8080"
+      - "443:443"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "$PWD/traefik/traefik.dev.toml:/etc/traefik/traefik.toml"
+      - "$PWD/traefik/traefik.prod.toml:/etc/traefik/traefik.toml"
     depends_on:
       - backend
       - client
