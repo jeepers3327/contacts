@@ -28,7 +28,7 @@ config :phoenix, :json_library, Jason
 
 # Configure CORSPlug
 config :cors_plug,
-  origin: ["http://contacts.localhost"],
+  origin: ["http://client.contacts.localhost"],
   max_age: 86400,
   methods: ["GET", "POST", "PUT", "DELETE"]
 
