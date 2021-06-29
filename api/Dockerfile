@@ -1,4 +1,4 @@
-FROM elixir:1.12.1-slim AS dev
+FROM elixir:1.12.1-alpine AS dev
 
 WORKDIR /app
 ADD . /app/
@@ -12,9 +12,7 @@ RUN mix deps.get && \
 CMD ["mix", "phx.server"]
 
 
-
-
-FROM elixir:1.12.1-slim AS build
+FROM elixir:1.12.1-alpine AS build
 
 RUN apk add --no-cache build-base git
 
@@ -35,12 +33,13 @@ RUN mix deps.compile
 COPY lib ./lib/
 COPY priv ./priv/
 
+RUN mix compile
 RUN mix release
 
+FROM alpine:3.14.0 AS prod
 
-FROM alpine:3.14.0 as prod
-
-RUN apk add --update openssl ncurses-libs postgresql-client && \
+RUN apk upgrade --no-cache && \ 
+    apk add --no-cache postgresql-client bash openssl libgcc libstdc++ ncurses-libs && \
     rm -rf /var/cache/apk/*
 
 RUN mkdir /app
