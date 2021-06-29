@@ -1,5 +1,5 @@
 [entryPoints]
-  [entryPoints.client]
+  [entryPoints.web]
     address = ":80"
 
 [api]
