@@ -8,10 +8,9 @@ COPY . .
 
 EXPOSE 3000
 
-# Finally runs the application
 CMD [ "yarn", "dev", "--host" ]
 
-FROM node:16-buster-slim as prod
+FROM node:16-buster-slim as build-node
 
 WORKDIR /app
 
@@ -24,4 +23,9 @@ COPY index.html ./
 
 RUN yarn install && yarn build
 
+
+FROM nginx:1.21.0-alpine as prod
 EXPOSE 3000
+
+COPY --from=build-node /app/dist/ /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/nginx.conf
